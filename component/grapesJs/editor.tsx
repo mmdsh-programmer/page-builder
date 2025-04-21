@@ -152,6 +152,13 @@ const Editor = () => {
           command: () => loadProjectData(),
           className: 'fa fa-upload',
           attributes: { title: 'Load Project' }
+        },
+        // Add preview button
+        {
+          id: 'preview-static',
+          command: () => previewStatic(),
+          className: 'fa fa-eye',
+          attributes: { title: 'Preview' }
         }
       ]);
     }
@@ -180,6 +187,10 @@ const Editor = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const previewStatic = () => {
+    window.open('/static', '_blank');
   };
 
   return (
