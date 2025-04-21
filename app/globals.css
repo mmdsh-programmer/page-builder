@@ -46,4 +46,61 @@ body {
 .swiper-slide img {
   @apply block w-full h-full object-cover;
 }
+
+.gjs-pn-views-container {
+  @apply h-screen overflow-y-auto;
+}
+
+/* Fix device viewport display */
+.gjs-frame-wrapper {
+  transition: width 0.2s ease;
+}
+
+.gjs-frame {
+  @apply m-0 h-[calc(100vh-42px)] !bottom-0;
+}
+
+/* Device-specific styles */
+.gjs-device-mobile .gjs-frame {
+  width: 320px !important;
+}
+
+.gjs-device-tablet .gjs-frame {
+  width: 768px !important;
+}
+
+/* Fix device buttons */
+.gjs-pn-devices-c {
+  padding-left: 30px !important;
+}
+
+.gjs-devices-c {
+  padding: 0;
+}
+
+.gjs-pn-devices-c {
+  right: auto;
+}
+
+.gjs-pn-panel.gjs-pn-devices-c .gjs-btn-prim {
+  margin: 0 5px;
+}
+
+.gjs-pn-panel .gjs-pn-buttons {
+  display: flex;
+  align-items: center;
+}
+
+/* Ensure mobile view works */
+.gjs-frame-wrapper.gjs-frame-wrapper--active {
+  width: 100%;
+}
+
+.gjs-device-mobile .gjs-frame-wrapper {
+  width: 320px !important;
+}
+
+.gjs-device-tablet .gjs-frame-wrapper {
+  width: 768px !important;
+}
  
