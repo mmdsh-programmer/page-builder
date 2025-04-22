@@ -5,7 +5,10 @@ import React, { useEffect, useRef } from "react";
 import axios from "axios";
 import gjsForms from "grapesjs-plugin-forms";
 import gjsPresetWebpage from "grapesjs-preset-webpage";
-import grapesjs, { Editor as GrapesEditor } from "grapesjs";
+import grapesjs, {
+  Editor as GrapesEditor,
+  Component as GrapesJSComponent,
+} from "grapesjs";
 import grapesjsBlocksBasic from "grapesjs-blocks-basic";
 import columnSystem from "../../plugins/columnSystem";
 
@@ -18,214 +21,348 @@ const Editor = () => {
       fromElement: false,
       storageManager: {
         type: "none", // Explicitly disable storage
-        autosave: false
+        autosave: false,
       },
-      plugins: [
-        grapesjsBlocksBasic, 
-        gjsPresetWebpage, 
-        gjsForms,
-        columnSystem
-      ],
+      plugins: [grapesjsBlocksBasic, gjsPresetWebpage, gjsForms, columnSystem],
       pluginsOpts: {
         swiperComponent: {},
         columnSystem: {
-          category: 'Layout',
-          flexLabel: 'Flex Row',
-          gridLabel: 'Grid Row'
-        }
+          category: "Layout",
+          flexLabel: "Flex Row",
+          gridLabel: "Grid Row",
+        },
       },
       // Configure asset manager
       assetManager: {
         assets: [],
         dropzone: true,
-        upload: '/api/upload-asset', // Endpoint for asset uploads
+        upload: "/api/upload-asset", // Endpoint for asset uploads
       },
       // Configure style manager with common properties
       styleManager: {
         sectors: [
           {
-            name: 'Dimension',
+            name: "Dimension",
             open: false,
-            buildProps: ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height', 'padding', 'margin'],
+            buildProps: [
+              "width",
+              "height",
+              "min-width",
+              "min-height",
+              "max-width",
+              "max-height",
+              "padding",
+              "margin",
+            ],
           },
           {
-            name: 'Typography',
+            name: "Typography",
             open: false,
-            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration', 'text-shadow'],
+            buildProps: [
+              "font-family",
+              "font-size",
+              "font-weight",
+              "letter-spacing",
+              "color",
+              "line-height",
+              "text-align",
+              "text-decoration",
+              "text-shadow",
+            ],
           },
           {
-            name: 'Decorations',
+            name: "Decorations",
             open: false,
-            buildProps: ['background-color', 'border', 'border-radius', 'box-shadow'],
+            buildProps: [
+              "background-color",
+              "border",
+              "border-radius",
+              "box-shadow",
+            ],
           },
         ],
       },
       canvas: {
-        styles:["http://localhost:3000/swiper-bundle.min.css", "http://localhost:3000/custom.css"],
+        styles: [
+          "http://localhost:3000/swiper-bundle.min.css",
+          "http://localhost:3000/custom.css",
+        ],
         scripts: ["http://localhost:3000/swiper-bundle.min.js"],
       },
     });
 
+    // Add custom CSS modal
+    const mdl = editor.current.Modal;
+    const cmd = editor.current.Commands;
+    let cssEditor: HTMLTextAreaElement | null = null;
+
+    cmd.add("open-custom-css", {
+      run(editor) {
+        const selected = editor.getSelected();
+        if (!selected) {
+          mdl.open({
+            title: "Custom CSS",
+            content: "Please select a component first",
+          });
+          return;
+        }
+
+        // Get component custom CSS
+        const customCSS = selected.get("custom-css") || "";
+
+        mdl.open({
+          title: "Custom CSS for " + selected.getName(),
+          content: `
+            <div style="margin-bottom: 10px; position: relative;">
+              <textarea id="custom-css-editor"
+                style="min-height: 250px; width: 100%; padding: 10px; font-family: monospace; resize: vertical;"
+                placeholder="/* Custom CSS for this component */
+                .my-class {
+                  color: red;
+                }
+              "
+              >${customCSS}</textarea>
+              <button id="apply-custom-css" style="margin-top: 10px; padding: 5px 10px; background: #4285f4; color: white; border: none; border-radius: 3px; cursor: pointer;">Apply CSS</button>
+            </div>
+          `,
+        });
+
+        cssEditor = document.getElementById(
+          "custom-css-editor"
+        ) as HTMLTextAreaElement;
+        const applyBtn = document.getElementById("apply-custom-css");
+
+        if (applyBtn) {
+          applyBtn.onclick = () => {
+            if (!cssEditor) return;
+            const css = cssEditor.value;
+
+            // Save CSS on the component
+            selected.set("custom-css", css);
+
+            // Apply the CSS
+            applyComponentCSS(selected, css);
+          };
+        }
+      },
+    });
+
+    // Function to apply custom CSS
+    function applyComponentCSS(component: GrapesJSComponent, css: string) {
+      if (!component || !css) return;
+
+      const componentId = component.getId();
+      let styleEl = document.getElementById(`custom-css-${componentId}`);
+
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = `custom-css-${componentId}`;
+        document.head.appendChild(styleEl);
+      }
+
+      try {
+        // Create scoped CSS
+        const scopedCss = css
+          .replace(/\/\*[\s\S]*?\*\//g, "") // Remove comments
+          .replace(
+            /([^{]+)({[^}]*})/g,
+            (match: string, selector: string, rules: string) => {
+              const scopedSelector = selector
+                .split(",")
+                .map(
+                  (s: string) =>
+                    `#${componentId}${
+                      s.trim().startsWith("&")
+                        ? s.trim().substring(1)
+                        : " " + s.trim()
+                    }`
+                )
+                .join(",");
+              return `${scopedSelector}${rules}`;
+            }
+          );
+
+        styleEl.innerHTML = scopedCss;
+      } catch (e) {
+        console.error("Error applying custom CSS:", e);
+      }
+    }
+
+    // Apply custom CSS when components change
+    editor.current.on("component:selected", (component: GrapesJSComponent) => {
+      if (!component) return;
+
+      const css = component.get("custom-css");
+      if (css) {
+        applyComponentCSS(component, css);
+      }
+    });
+
     // Add custom command to fix iframe scrolling
-    editor.current.Commands.add('fix-iframe-scroll', {
+    editor.current.Commands.add("fix-iframe-scroll", {
       run: (editor) => {
         try {
           // Get the iframe element
           const iframe = editor.Canvas.getFrameEl();
           if (!iframe) return;
-          
+
           // Make the iframe's content scrollable
-          iframe.style.overflow = 'auto';
-          
+          iframe.style.overflow = "auto";
+
           // Access the iframe's document and body
           const iframeWindow = iframe.contentWindow;
           if (!iframeWindow) return false;
-          
+
           const iframeDoc = iframe.contentDocument || iframeWindow.document;
           const iframeHtml = iframeDoc.documentElement;
           const iframeBody = iframeDoc.body;
-          
+
           // Apply styles to the html element
-          iframeHtml.style.height = '100%';
-          iframeHtml.style.overflowY = 'auto';
-          
+          iframeHtml.style.height = "100%";
+          iframeHtml.style.overflowY = "auto";
+
           // Apply styles to the body element
-          iframeBody.style.height = 'auto';
-          iframeBody.style.minHeight = '100%';
-          
+          iframeBody.style.height = "auto";
+          iframeBody.style.minHeight = "100%";
+
           // Create and append a style element
-          const styleEl = iframeDoc.createElement('style');
+          const styleEl = iframeDoc.createElement("style");
           styleEl.textContent = `
             html { height: 100% !important; overflow-y: auto !important; }
             body { height: auto !important; min-height: 100% !important; overflow-y: auto !important; }
           `;
           iframeDoc.head.appendChild(styleEl);
-          
+
           return true;
         } catch (err) {
-          console.error('Error fixing iframe scroll:', err);
+          console.error("Error fixing iframe scroll:", err);
           return false;
         }
-      }
+      },
     });
-    
+
     // Run the command on canvas load
-    editor.current.on('canvas:load', () => {
+    editor.current.on("canvas:load", () => {
       if (editor.current) {
-        editor.current.runCommand('fix-iframe-scroll');
-        
+        editor.current.runCommand("fix-iframe-scroll");
+
         // Create a MutationObserver to watch for changes in the iframe
         try {
           const canvas = editor.current.Canvas;
           const iframe = canvas.getFrameEl();
-          
+
           if (iframe && iframe.contentWindow && iframe.contentDocument) {
             const observer = new MutationObserver(() => {
               // Re-apply scroll fix when content changes
-              editor.current?.runCommand('fix-iframe-scroll');
+              editor.current?.runCommand("fix-iframe-scroll");
             });
-            
+
             // Start observing the iframe body for structure changes
             observer.observe(iframe.contentDocument.body, {
               childList: true,
               subtree: true,
               attributes: false,
-              characterData: false
+              characterData: false,
             });
           }
         } catch (err) {
-          console.error('Error setting up MutationObserver:', err);
+          console.error("Error setting up MutationObserver:", err);
         }
       }
     });
 
     // Add a component type that ensures scrollable containers
-    editor.current.DomComponents.addType('scrollable', {
+    editor.current.DomComponents.addType("scrollable", {
       model: {
         defaults: {
-          attributes: { class: 'scrollable-component' },
+          attributes: { class: "scrollable-component" },
           style: {
-            'overflow-y': 'auto',
-            'min-height': '100px',
+            "overflow-y": "auto",
+            "min-height": "100px",
           },
-        }
-      }
+        },
+      },
     });
-    
+
     // Add a block for scrollable containers
-    editor.current.BlockManager.add('scrollable-container', {
-      label: 'Scrollable Container',
-      category: 'Basic',
+    editor.current.BlockManager.add("scrollable-container", {
+      label: "Scrollable Container",
+      category: "Basic",
       content: {
-        type: 'scrollable',
-        content: '<div>Add content here that can scroll</div>',
+        type: "scrollable",
+        content: "<div>Add content here that can scroll</div>",
         style: {
-          'min-height': '200px',
-          'max-height': '400px',
-          'overflow-y': 'auto',
-          'border': '1px solid #ccc',
-          'padding': '10px'
-        }
-      }
+          "min-height": "200px",
+          "max-height": "400px",
+          "overflow-y": "auto",
+          border: "1px solid #ccc",
+          padding: "10px",
+        },
+      },
     });
 
     // Add device manager buttons
     const panelDevices = editor.current.Panels.addPanel({
-      id: 'devices-c',
+      id: "devices-c",
       visible: true,
-      buttons: []
+      buttons: [],
     });
-    
-    const buttons = panelDevices.get('buttons');
+
+    const buttons = panelDevices.get("buttons");
     if (buttons) {
       buttons.add([
         {
-          id: 'save-project',
+          id: "save-project",
           command: () => getProjectData(),
-          className: 'fa fa-floppy-o',
-          attributes: { title: 'Save Project' }
+          className: "fa fa-floppy-o",
+          attributes: { title: "Save Project" },
         },
         // Add load button
         {
-          id: 'load-project',
+          id: "load-project",
           command: () => loadProjectData(),
-          className: 'fa fa-upload',
-          attributes: { title: 'Load Project' }
+          className: "fa fa-upload",
+          attributes: { title: "Load Project" },
         },
         // Add preview button
         {
-          id: 'preview-static',
+          id: "preview-static",
           command: () => previewStatic(),
-          className: 'fa fa-eye',
-          attributes: { title: 'Preview' }
-        }
+          className: "fa fa-eye",
+          attributes: { title: "Preview" },
+        },
+        {
+          id: "custom-css-btn",
+          className: "fa fa-css3",
+          command: "open-custom-css",
+          attributes: { title: "Custom CSS" },
+        },
       ]);
     }
-
   }, []);
 
   const getProjectData = async () => {
     try {
       if (!editor.current) return;
-      
+
       // Get all project data
       const projectData = editor.current.getProjectData();
-      
+
       // Extract HTML and CSS separately for easier rendering in preview
       const html = editor.current.getHtml();
       const css = editor.current.getCss();
-      
+
       // Create enhanced data object with both project data and extracted HTML/CSS
       const enhancedData = {
         ...projectData,
         html,
-        css
+        css,
       };
-      
+
       await axios.post("/api", {
         data: enhancedData,
       });
-      alert('Template saved successfully!');
+      alert("Template saved successfully!");
     } catch (error) {
       console.log(error);
     }
@@ -237,15 +374,15 @@ const Editor = () => {
       const response = await axios.get("/api");
       const data = response.data;
       editor.current.loadProjectData(data);
-      alert('Template loaded successfully!');
+      alert("Template loaded successfully!");
     } catch (error) {
       console.error("Error loading project:", error);
-      alert('Failed to load template.');
+      alert("Failed to load template.");
     }
   };
 
   const previewStatic = () => {
-    window.open('/static', '_blank');
+    window.open("/static", "_blank");
   };
 
   return (
