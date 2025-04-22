@@ -4,47 +4,9 @@
 
 @import "grapesjs/dist/css/grapes.min.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Components */
-.swiper {
-  @apply absolute inset-0 w-full h-full;
-}
-
-.swiper-pagination {
-  @apply h-auto p-1.5;
-}
-
-.swiper-container {
-  @apply w-full max-w-full max-h-screen min-h-0 min-w-0;
-}
-
-.swiper-wrapper {
-  @apply h-full max-h-full flex;
-}
-
-.swiper-slide {
-  @apply w-auto flex-shrink-0 block h-full max-h-full;
-}
-
-.swiper-slide img {
-  @apply block w-full h-full object-cover;
 }
 
 .gjs-pn-views-container {

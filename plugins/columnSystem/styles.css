@@ -1,0 +1,80 @@
+/* Grid system styles */
+.grid-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed #ccc;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.grid-cell {
+  min-height: 50px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Visual indicators in editor */
+.gjs-editor .grid-row {
+  position: relative;
+}
+
+.gjs-editor .grid-row::before {
+  content: "Grid Row";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: #4285f4;
+  color: white;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 3px;
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* Flex system styles */
+.flex-row {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed #ccc;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.flex-column {
+  flex: 1 0 33.333%;
+  min-height: 50px;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+/* Visual indicators in editor */
+.gjs-editor .flex-row {
+  position: relative;
+}
+
+.gjs-editor .flex-row::before {
+  content: "Flex Row";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  background: #34a853;
+  color: white;
+  padding: 2px 8px;
+  font-size: 11px;
+  border-radius: 3px;
+  opacity: 0.8;
+  pointer-events: none;
+} 

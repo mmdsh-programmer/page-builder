@@ -7,7 +7,7 @@ import gjsForms from "grapesjs-plugin-forms";
 import gjsPresetWebpage from "grapesjs-preset-webpage";
 import grapesjs, { Editor as GrapesEditor } from "grapesjs";
 import grapesjsBlocksBasic from "grapesjs-blocks-basic";
-import swiperComponent from "@/plugins/swiper";
+import columnSystem from "../../plugins/columnSystem";
 
 const Editor = () => {
   const editor = useRef<GrapesEditor | null>(null);
@@ -16,10 +16,49 @@ const Editor = () => {
     editor.current = grapesjs.init({
       container: "#gjs",
       fromElement: false,
-      storageManager: false,
-      plugins: [grapesjsBlocksBasic, gjsPresetWebpage, gjsForms, swiperComponent],
+      storageManager: {
+        type: "none", // Explicitly disable storage
+        autosave: false
+      },
+      plugins: [
+        grapesjsBlocksBasic, 
+        gjsPresetWebpage, 
+        gjsForms,
+        columnSystem
+      ],
       pluginsOpts: {
-        swiperComponent:{}
+        swiperComponent: {},
+        columnSystem: {
+          category: 'Layout',
+          flexLabel: 'Flex Row',
+          gridLabel: 'Grid Row'
+        }
+      },
+      // Configure asset manager
+      assetManager: {
+        assets: [],
+        dropzone: true,
+        upload: '/api/upload-asset', // Endpoint for asset uploads
+      },
+      // Configure style manager with common properties
+      styleManager: {
+        sectors: [
+          {
+            name: 'Dimension',
+            open: false,
+            buildProps: ['width', 'height', 'min-width', 'min-height', 'max-width', 'max-height', 'padding', 'margin'],
+          },
+          {
+            name: 'Typography',
+            open: false,
+            buildProps: ['font-family', 'font-size', 'font-weight', 'letter-spacing', 'color', 'line-height', 'text-align', 'text-decoration', 'text-shadow'],
+          },
+          {
+            name: 'Decorations',
+            open: false,
+            buildProps: ['background-color', 'border', 'border-radius', 'box-shadow'],
+          },
+        ],
       },
       canvas: {
         styles:["http://localhost:3000/swiper-bundle.min.css", "http://localhost:3000/custom.css"],
@@ -168,9 +207,23 @@ const Editor = () => {
   const getProjectData = async () => {
     try {
       if (!editor.current) return;
-      const data = editor.current.getProjectData();
+      
+      // Get all project data
+      const projectData = editor.current.getProjectData();
+      
+      // Extract HTML and CSS separately for easier rendering in preview
+      const html = editor.current.getHtml();
+      const css = editor.current.getCss();
+      
+      // Create enhanced data object with both project data and extracted HTML/CSS
+      const enhancedData = {
+        ...projectData,
+        html,
+        css
+      };
+      
       await axios.post("/api", {
-        data,
+        data: enhancedData,
       });
       alert('Template saved successfully!');
     } catch (error) {
@@ -181,11 +234,13 @@ const Editor = () => {
   const loadProjectData = async () => {
     try {
       if (!editor.current) return;
-      const result = await axios.get("/api");
-      editor.current.loadProjectData(JSON.parse(result.data.data));
+      const response = await axios.get("/api");
+      const data = response.data;
+      editor.current.loadProjectData(data);
       alert('Template loaded successfully!');
     } catch (error) {
-      console.log(error);
+      console.error("Error loading project:", error);
+      alert('Failed to load template.');
     }
   };
 
