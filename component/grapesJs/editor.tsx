@@ -11,6 +11,7 @@ import { setupCustomComponents, setupCustomBlocks } from "./utils/componentsMana
 import { saveProjectData, loadProjectData } from "./utils/projectManager";
 import { setupEditorStyles } from "./utils/cssManager";
 import { openPreviewInNewTab, showPreviewInModal } from "./utils/previewManager";
+import { setupTailwindIntegration } from "./utils/tailwindIntegration";
 
 const Editor = () => {
   const editor = useRef<GrapesEditor | null>(null);
@@ -29,6 +30,7 @@ const Editor = () => {
     setupCustomComponents(currentEditor);
     setupCustomBlocks(currentEditor);
     setupEditorStyles(currentEditor);
+    setupTailwindIntegration(currentEditor);
     
     // Add device manager buttons
     const panelDevices = currentEditor.Panels.addPanel({

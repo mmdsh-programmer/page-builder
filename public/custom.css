@@ -1,3 +1,6 @@
+/* Import Tailwind CSS */
+@import "tailwindcss";
+
 /* Custom styles for GrapeJS iframe content */
 html {
   height: 100% !important;
@@ -80,4 +83,50 @@ h5 {
 h6 {
   font-size: 1rem;
   font-weight: 600;
+}
+
+/* GrapesJS specific styles */
+.gjs-cv-canvas {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+/* Editor customizations */
+.gjs-btn-prim {
+  background-color: #6366f1 !important;
+  color: white !important;
+}
+
+.gjs-btn-prim:hover {
+  background-color: #4f46e5 !important;
+}
+
+/* Tailwind styles for editor components */
+.tailwind-section {
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Add this class to help identify components using Tailwind CSS */
+.tailwind-enabled {
+  position: relative;
+}
+
+.tailwind-enabled::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  border: 2px dashed transparent;
+  transition: border-color 0.2s;
+}
+
+.tailwind-enabled:hover::before {
+  border-color: rgba(99, 102, 241, 0.5);
 }

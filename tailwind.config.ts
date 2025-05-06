@@ -6,6 +6,7 @@ const config: Config = {
     "./component/**/*.{js,ts,jsx,tsx,mdx}",
     "./plugins/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./grapesjs-content/**/*.{html,js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {

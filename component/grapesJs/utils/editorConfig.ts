@@ -16,6 +16,7 @@ import grapesjsBlocksFlexbox from "grapesjs-blocks-flexbox";
 import grapesjsTooltip from "grapesjs-tooltip";
 import grapesjsCustomCode from "grapesjs-custom-code";
 import grapesjsTyped from "grapesjs-typed";
+import grapesjsTailwindcss from "grapesjs-tailwindcss-plugin";
 import columnSystem from "../../../plugins/columnSystem";
 import parserPostCSS from "grapesjs-parser-postcss";
 
@@ -44,12 +45,18 @@ export const getEditorConfig = () => {
       grapesjsCustomCode,
       grapesjsTyped,
       parserPostCSS,
+      grapesjsTailwindcss,
     ],
     pluginsOpts: {
       columnSystem: {
         category: "Layout",
         flexLabel: "Flex Row",
         gridLabel: "Grid Row",
+      },
+      "grapesjs-tailwindcss-plugin": {
+        autobuild: true, // Automatically rebuild Tailwind CSS on each update
+        buildButton: true, // Add a manual build button to the toolbar
+        toolbarPanel: 'options',
       },
     },
     // Configure asset manager
