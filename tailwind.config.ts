@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+import type { Config } from "tailwindcss";  
 
 const config: Config = {
   content: [
@@ -12,6 +12,10 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+      },
+      fontFamily: {
+        iranYekan: ["var(--font-iran-yekan)", 'sans-serif'],
+        iranSans: ["var(--font-iran-sans)", 'sans-serif'],
       },
     },
   },

@@ -1,19 +1,40 @@
 import "./globals.css";
-import "../public/swiper-bundle.min.css";
 
 import type { Metadata } from "next";
-import Script from "next/script";
 import localFont from "next/font/local";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+const iranYekan = localFont({
+  src: [
+    {
+      path: "./fonts/IRANYekanRegular.ttf",
+      style: "normal",
+      weight: "400",
+    },
+    {
+      path: "./fonts/IRANYekanMedium.ttf",
+      style: "normal",
+      weight: "500",
+    },
+    {
+      path: "./fonts/IRANYekanBold.ttf",
+      style: "normal",
+      weight: "700",
+    },
+  ],
+  variable: "--font-iran-yekan",
+  display: "swap",
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
+
+const iranSans = localFont({
+  src: [
+    {
+      path: "./fonts/IRANSansWeb.woff2",
+      style: "normal",
+      weight: "400",
+    },
+  ],
+  variable: "--font-iran-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -29,9 +50,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${iranSans.variable} ${iranYekan.variable} antialiased`}
       >
-        <Script strategy="beforeInteractive" src="http://localhost:3000/swiper-bundle.min.js" />
         {children}
       </body>
     </html>
