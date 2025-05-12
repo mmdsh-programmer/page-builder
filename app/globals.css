@@ -63,3 +63,7 @@ body {
   width: 768px !important;
 }
  
+@theme {
+  --font-iran-sans: 'Iran Sans', sans-serif;
+  --font-iran-yekan: 'Iran Yekan', sans-serif;
+}
