@@ -188,6 +188,56 @@ export const getEditorConfig = () => {
             }
           ],
         },
+        {
+          name: "Overflow & Visibility",
+          open: false,
+          buildProps: [
+            "overflow",
+            "overflow-x",
+            "overflow-y"
+          ],
+          properties: [
+            {
+              name: 'Overflow',
+              property: 'overflow',
+              type: 'select',
+              defaults: 'visible',
+              list: [
+                { value: 'visible', name: 'Visible' },
+                { value: 'hidden', name: 'Hidden' },
+                { value: 'scroll', name: 'Scroll' },
+                { value: 'auto', name: 'Auto' },
+                { value: 'clip', name: 'Clip' },
+              ],
+            },
+            {
+              name: 'Overflow X',
+              property: 'overflow-x',
+              type: 'select',
+              defaults: 'visible',
+              list: [
+                { value: 'visible', name: 'Visible' },
+                { value: 'hidden', name: 'Hidden' },
+                { value: 'scroll', name: 'Scroll' },
+                { value: 'auto', name: 'Auto' },
+                { value: 'clip', name: 'Clip' },
+              ],
+            },
+            {
+              name: 'Overflow Y',
+              property: 'overflow-y',
+              type: 'select',
+              defaults: 'visible',
+              list: [
+                { value: 'visible', name: 'Visible' },
+                { value: 'hidden', name: 'Hidden' },
+                { value: 'scroll', name: 'Scroll' },
+                { value: 'auto', name: 'Auto' },
+                { value: 'clip', name: 'Clip' },
+              ],
+            },
+          ],
+        },
       ],
     },
     canvas: {
