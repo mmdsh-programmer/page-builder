@@ -90,4 +90,12 @@ export const setupCustomBlocks = (editor: Editor) => {
     content: '<h6>Heading 6</h6>',
     media: '<svg viewBox="0 0 24 24"><path d="M3 4h18v2H3V4zm0 14h18v2H3v-2zm0-7h18v2H3v-2z"></path><text x="12" y="16" text-anchor="middle" font-size="6" font-weight="bold">H6</text></svg>'
   });
+
+  // Add a Section block
+  editor.BlockManager.add("section", {
+    label: "Section",
+    category: "Basic",
+    content: `<section><p>section</p></section>`,
+    media: '<svg viewBox="0 0 24 24" width="24" height="24"><rect x="3" y="5" width="18" height="14" rx="2" fill="#e5e7eb" stroke="#374151" stroke-width="1.5"/><rect x="3" y="5" width="18" height="4" rx="1" fill="#6366f1"/><text x="12" y="14" text-anchor="middle" font-size="7" font-weight="bold" fill="#374151">Sec</text></svg>'
+  });
 }; 
