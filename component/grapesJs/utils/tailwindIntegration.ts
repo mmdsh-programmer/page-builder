@@ -25,21 +25,21 @@ export const setupTailwindIntegration = (editor: GrapesEditor) => {
     });
   }
 
-  // Example of adding a manual rebuild button to a custom panel
-  // Uncomment this if you need it
-  /*
-  const panelManager = editor.Panels;
-  const customPanel = panelManager.addPanel({
-    id: 'tailwind-tools',
-    visible: true,
-    buttons: [
-      {
-        id: 'rebuild-tailwind',
-        className: 'fa fa-refresh',
-        command: 'build-tailwind',
-        attributes: { title: 'Rebuild Tailwind CSS' },
-      }
-    ],
+  // Additional events to catch when components are modified
+  // This helps ensure Tailwind classes are applied when editing components
+  editor.on('component:update:classes', () => {
+    editor.runCommand('build-tailwind');
   });
-  */
+
+  // When styles are changed
+  editor.on('style:update', () => {
+    editor.runCommand('build-tailwind');
+  });
+
+  // After components are loaded
+  editor.on('components:add', () => {
+    setTimeout(() => {
+      editor.runCommand('build-tailwind');
+    }, 300);
+  });
 }; 

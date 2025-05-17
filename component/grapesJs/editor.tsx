@@ -32,6 +32,11 @@ const Editor = () => {
     setupEditorStyles(currentEditor);
     setupTailwindIntegration(currentEditor);
     
+    // Force initial build of Tailwind CSS to ensure classes are applied
+    setTimeout(() => {
+      currentEditor.runCommand('build-tailwind');
+    }, 500);
+    
     // Add device manager buttons
     const panelDevices = currentEditor.Panels.addPanel({
       id: "devices-c",

@@ -16,6 +16,15 @@ export const setupCustomComponents = (editor: Editor) => {
       },
     },
   });
+
+  // Allow children inside <a> (link) blocks
+  editor.DomComponents.addType('link', {
+    model: {
+      defaults: {
+        droppable: true,
+      },
+    },
+  });
 };
 
 /**

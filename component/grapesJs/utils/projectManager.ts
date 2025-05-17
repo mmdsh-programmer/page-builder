@@ -71,6 +71,12 @@ export const loadProjectData = async (editor: Editor): Promise<{ success: boolea
     }
     
     editor.loadProjectData(projectData);
+    
+    // Force rebuild of Tailwind CSS after loading project to ensure classes are applied
+    setTimeout(() => {
+      editor.runCommand('build-tailwind');
+    }, 300);
+    
     return { success: true };
   } catch (error) {
     console.error('Error loading project:', error);
