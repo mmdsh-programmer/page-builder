@@ -189,6 +189,51 @@ export const getEditorConfig = () => {
           ],
         },
         {
+          name: "Image",
+          open: false,
+          buildProps: [
+            "width",
+            "height",
+            "aspect-ratio",
+            "object-fit",
+            "object-position",
+            "filter"
+          ],
+          properties: [
+            {
+              name: 'Object Fit',
+              property: 'object-fit',
+              type: 'select',
+              defaults: 'fill',
+              list: [
+                { value: 'fill', name: 'Fill' },
+                { value: 'contain', name: 'Contain' },
+                { value: 'cover', name: 'Cover' },
+                { value: 'none', name: 'None' },
+                { value: 'scale-down', name: 'Scale Down' },
+              ],
+            },
+            {
+              name: 'Object Position',
+              property: 'object-position',
+              type: 'text',
+              defaults: '50% 50%',
+            },
+            {
+              name: 'Aspect Ratio',
+              property: 'aspect-ratio',
+              type: 'text',
+              defaults: '',
+            },
+            {
+              name: 'Filter',
+              property: 'filter',
+              type: 'text',
+              defaults: '',
+            },
+          ],
+        },
+        {
           name: "Overflow & Visibility",
           open: false,
           buildProps: [
