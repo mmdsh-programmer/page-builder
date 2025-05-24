@@ -1,9 +1,12 @@
-import { Component as GrapesJSComponent, Editor } from 'grapesjs';
+import { Component as GrapesJSComponent, Editor } from "grapesjs";
 
 /**
  * Apply custom CSS to a specific component
  */
-export const applyComponentCSS = (component: GrapesJSComponent, css: string) => {
+export const applyComponentCSS = (
+  component: GrapesJSComponent,
+  css: string
+) => {
   if (!component || !css) return;
 
   const componentId = component.getId();
@@ -111,4 +114,4 @@ export const setupComponentCSSModal = (editor: Editor) => {
       applyComponentCSS(component, css);
     }
   });
-}; 
+};

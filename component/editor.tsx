@@ -4,17 +4,19 @@ import React, { useEffect, useRef } from "react";
 import grapesjs, { Editor as GrapesEditor } from "grapesjs";
 
 // Import configs and utilities
-import { getEditorConfig } from "./utils/editorConfig";
-import { setupComponentCSSModal } from "./utils/componentCssManager";
-import { setupIframeScrolling } from "./utils/iframeManager";
-import { setupCustomComponents, setupCustomBlocks } from "./utils/componentsManager";
-import { saveProjectData, loadProjectData } from "./utils/projectManager";
-import { setupEditorStyles } from "./utils/cssManager";
-import { openPreviewInNewTab, showPreviewInModal } from "./utils/previewManager";
-import { setupTailwindIntegration } from "./utils/tailwindIntegration";
+import { getEditorConfig } from "@/utils/editorConfig";
+import { setupComponentCSSModal } from "@/utils/componentCssManager";
+import { setupIframeScrolling } from "@/utils/iframeManager";
+import { setupCustomComponents, setupCustomBlocks } from "@/utils/componentsManager";
+import { saveProjectData, loadProjectData } from "@/utils/projectManager";
+import { setupEditorStyles } from "@/utils/cssManager";
+import { openPreviewInNewTab, showPreviewInModal } from "@/utils/previewManager";
+import { setupTailwindIntegration } from "@/utils/tailwindIntegration";
+import PageManager from "./pageManager";
 
 const Editor = () => {
   const editor = useRef<GrapesEditor | null>(null);
+  const [pageManagerOpen, setPageManagerOpen] = React.useState(false);
   
   useEffect(() => {
     if (editor.current) return;
@@ -82,6 +84,15 @@ const Editor = () => {
         },
       ]);
     }
+
+    // Add a button to open the page manager
+    currentEditor.Panels.addButton('views', {
+      id: 'open-pages',
+      className: 'fa fa-file-o',
+      attributes: { title: 'Manage Pages' },
+      command: () => setPageManagerOpen(true),
+      togglable: false,
+    });
   }, []);
 
   const handleSaveProject = async () => {
@@ -123,6 +134,7 @@ const Editor = () => {
     <div className="GrapesjsApp h-screen w-screen flex flex-col overflow-hidden">
       <div className="Editor-content flex-grow overflow-hidden relative">
         <div id="gjs" className="!h-full w-full absolute inset-0" />
+        <PageManager editor={editor.current} open={pageManagerOpen} onClose={() => setPageManagerOpen(false)} />
       </div>
     </div>
   );

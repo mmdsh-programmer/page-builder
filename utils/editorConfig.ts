@@ -17,7 +17,7 @@ import grapesjsTooltip from "grapesjs-tooltip";
 import grapesjsCustomCode from "grapesjs-custom-code";
 import grapesjsTyped from "grapesjs-typed";
 import grapesjsTailwindcss from "grapesjs-tailwindcss-plugin";
-import columnSystem from "../../../plugins/columnSystem";
+import columnSystem from "@/plugins/columnSystem";
 import parserPostCSS from "grapesjs-parser-postcss";
 
 export const getEditorConfig = () => {
@@ -25,8 +25,9 @@ export const getEditorConfig = () => {
     container: "#gjs",
     fromElement: false,
     storageManager: {
-      type: "none", 
-      autosave: false,
+      type: "local",
+      autosave: true,
+      autoload: true,
     },
     plugins: [
       grapesjsBlocksBasic, 
@@ -59,6 +60,7 @@ export const getEditorConfig = () => {
         toolbarPanel: 'options',
       },
     },
+    pageManager: {},
     // Configure asset manager
     assetManager: {
       assets: [],

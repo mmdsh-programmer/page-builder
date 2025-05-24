@@ -1,4 +1,4 @@
-import Editor from "@/component/grapesJs/editor";
+import Editor from "@/component/editor";
 
 export default function Home() {
   return (

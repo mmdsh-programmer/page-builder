@@ -1,4 +1,4 @@
-import { Editor } from 'grapesjs';
+import { Editor } from "grapesjs";
 
 /**
  * Fixes iframe scrolling issues in the GrapesJS editor
@@ -79,4 +79,4 @@ export const setupIframeScrolling = (editor: Editor) => {
       console.error("Error setting up MutationObserver:", err);
     }
   });
-}; 
+};

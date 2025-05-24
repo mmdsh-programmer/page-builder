@@ -1,4 +1,4 @@
-import Preview from '@/component/grapesJs/preview'
+import Preview from '@/component/preview'
 import React from 'react'
 
 const page = async() => {

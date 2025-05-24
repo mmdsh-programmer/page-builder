@@ -37,3 +37,8 @@ export interface ColumnSystemOptions {
   };
   styleManager?: boolean;
 }
+
+export interface PageInfo {
+  id: string;
+  name: string;
+}

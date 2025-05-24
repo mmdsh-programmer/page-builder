@@ -1,4 +1,4 @@
-import { Editor } from 'grapesjs';
+import { Editor } from "grapesjs";
 
 /**
  * Open a preview of the current editor content in a new tab
@@ -13,8 +13,8 @@ export const openPreviewInNewTab = () => {
 export const generateFullPreview = (editor: Editor): string => {
   const html = editor.getHtml();
   const css = editor.getCss();
-  const js = editor.getJs ? editor.getJs() : '';
-  
+  const js = editor.getJs ? editor.getJs() : "";
+
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -50,9 +50,9 @@ export const createPreviewDataUrl = (editor: Editor): string => {
 export const showPreviewInModal = (editor: Editor) => {
   const modal = editor.Modal;
   const previewUrl = createPreviewDataUrl(editor);
-  
+
   modal.open({
-    title: 'Preview',
+    title: "Preview",
     content: `
       <div style="position: relative; height: 90vh; width: 100%;">
         <iframe 
@@ -60,6 +60,6 @@ export const showPreviewInModal = (editor: Editor) => {
           style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
         ></iframe>
       </div>
-    `
+    `,
   });
-}; 
+};
