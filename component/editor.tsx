@@ -8,7 +8,6 @@ import { getEditorConfig } from "@/utils/editorConfig";
 import { setupComponentCSSModal } from "@/utils/componentCssManager";
 import { setupIframeScrolling } from "@/utils/iframeManager";
 import { setupCustomComponents, setupCustomBlocks } from "@/utils/componentsManager";
-import { saveProjectData, loadProjectData } from "@/utils/projectManager";
 import { setupEditorStyles } from "@/utils/cssManager";
 import { openPreviewInNewTab, showPreviewInModal } from "@/utils/previewManager";
 import { setupTailwindIntegration } from "@/utils/tailwindIntegration";
@@ -49,19 +48,6 @@ const Editor = () => {
     const buttons = panelDevices.get("buttons");
     if (buttons) {
       buttons.add([
-        {
-          id: "save-project",
-          command: () => handleSaveProject(),
-          className: "fa fa-floppy-o",
-          attributes: { title: "Save Project" },
-        },
-        // Add load button
-        {
-          id: "load-project",
-          command: () => handleLoadProject(),
-          className: "fa fa-upload",
-          attributes: { title: "Load Project" },
-        },
         // Add preview button
         {
           id: "preview-static",
@@ -95,31 +81,58 @@ const Editor = () => {
     });
   }, []);
 
-  const handleSaveProject = async () => {
-    if (!editor.current) return;
-    
-    const result = await saveProjectData(editor.current);
-    
-    if (result.success) {
-      alert("Template saved successfully!");
-    } else {
-      console.error("Failed to save template:", result.error);
-      alert("Failed to save template. Please try again.");
-    }
-  };
+  // Auto-load on mount
+  useEffect(() => {
+    const autoLoad = async () => {
+      if (!editor.current) return;
+      const ed = editor.current;
+      try {
+        const res = await fetch('/api');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data.pages && Array.isArray(data.pages)) {
+          ed.Pages.getAll().forEach(page => ed.Pages.remove(String(page.id)));
+          data.pages.forEach((page: {id: string|number, name: string, component: string, styles: string}) => {
+            ed.Pages.add({
+              id: String(page.id),
+              name: page.name,
+              component: page.component,
+              styles: page.styles,
+            });
+          });
+          if (data.pages.length > 0) ed.Pages.select(String(data.pages[0].id));
+        }
+      } catch {
+        // Silent fail
+      }
+    };
+    autoLoad();
+  }, []);
 
-  const handleLoadProject = async () => {
+  // Auto-save on any editor change
+  useEffect(() => {
     if (!editor.current) return;
-    
-    const result = await loadProjectData(editor.current);
-    
-    if (result.success) {
-      alert("Template loaded successfully!");
-    } else {
-      console.error("Failed to load template:", result.error);
-      alert("Failed to load template. Please try again.");
-    }
-  };
+    const ed = editor.current;
+    const autoSave = async () => {
+      const pages = ed.Pages.getAll().map(page => ({
+        id: String(page.id),
+        name: String(page.get('name')),
+        component: ed.getHtml({ component: page.getMainComponent() }),
+        styles: ed.getCss({ component: page.getMainComponent() }),
+      }));
+      try {
+        await fetch('/api', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: { pages } }),
+        });
+      } catch {}
+    };
+    ed.on('change', autoSave);
+    return () => {
+      ed.off('change', autoSave);
+    };
+  }, [editor.current]);
 
   const handlePreview = () => {
     openPreviewInNewTab();
