@@ -11,26 +11,12 @@ export const saveProjectData = async (
     if (!editor)
       return { success: false, error: new Error("Editor not initialized") };
 
-    // Extract HTML and CSS separately for easier rendering in preview
-    const html = editor.getHtml();
-    const css = editor.getCss();
-    const js = editor.getJs ? editor.getJs() : "";
+    // Get the full project data (as stored in localStorage by GrapesJS)
+    const projectData = editor.getProjectData();
 
-    // Get components and styles but handle circular references
-    const components = JSON.stringify(editor.getComponents());
-    const styles = JSON.stringify(editor.getStyle());
-
-    // Create enhanced data object with both project data and extracted HTML/CSS
-    const enhancedData = {
-      html,
-      css,
-      js,
-      components,
-      styles,
-    };
-
+    // Save to backend
     const response = await axios.post("/api", {
-      data: enhancedData,
+      data: projectData,
     });
 
     if (response.status === 200) {
@@ -57,25 +43,10 @@ export const loadProjectData = async (
     const response = await axios.get("/api");
     const data = response.data;
 
-    // Handle different ways data might be stored
+    // The backend returns the project data directly
     const projectData = data.data || data;
 
-    if (typeof projectData.components === "string") {
-      try {
-        projectData.components = JSON.parse(projectData.components);
-      } catch (e) {
-        console.warn("Error parsing components JSON:", e);
-      }
-    }
-
-    if (typeof projectData.styles === "string") {
-      try {
-        projectData.styles = JSON.parse(projectData.styles);
-      } catch (e) {
-        console.warn("Error parsing styles JSON:", e);
-      }
-    }
-
+    // Load the project data into GrapesJS
     editor.loadProjectData(projectData);
 
     // Force rebuild of Tailwind CSS after loading project to ensure classes are applied

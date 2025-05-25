@@ -97,9 +97,7 @@ const Editor = () => {
 
   const handleSaveProject = async () => {
     if (!editor.current) return;
-    
     const result = await saveProjectData(editor.current);
-    
     if (result.success) {
       alert("Template saved successfully!");
     } else {
