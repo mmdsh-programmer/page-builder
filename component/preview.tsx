@@ -1,70 +1,90 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+
+interface PagePreview {
+  html: string;
+  css: string;
+  js: string;
+}
+
+interface PageData {
+  name: string;
+  preview: PagePreview;
+}
 
 const Preview = () => {
-  const [html, setHtml] = useState<string>("");
-  const [css, setCss] = useState<string>("");
-  const [js, setJs] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
+  const [pages, setPages] = useState<PageData[]>([]);
+  const [selectedIdx, setSelectedIdx] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchPages = async () => {
       try {
         setLoading(true);
-        const response = await axios.get("/api");
-        const data = response.data.data || response.data;
-        
-        setHtml(data.html || "");
-        setCss(data.css || "");
-        setJs(data.js || "");
+        setError(null);
+        const res = await fetch("/api");
+        if (!res.ok) throw new Error("Failed to fetch data");
+        const data = await res.json();
+        setPages(data.pages || []);
         setLoading(false);
-      } catch (err) {
-        console.error("Failed to load preview data:", err);
-        setError("Failed to load preview data. Please try again.");
+      } catch (err: unknown) {
+        let message = "Unknown error";
+        if (err instanceof Error) message = err.message;
+        setError(message);
         setLoading(false);
       }
     };
-
-    fetchData();
+    fetchPages();
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="spinner-border mb-3" role="status">
-            <span className="sr-only">Loading...</span>
-          </div>
-          <p>Loading preview...</p>
-        </div>
-      </div>
-    );
+    return <div className="w-screen h-screen flex justify-center items-center">Loading...</div>;
+  }
+  if (error) {
+    return <div className="w-screen h-screen flex justify-center items-center text-red-500">{error}</div>;
+  }
+  if (!pages.length) {
+    return <div className="w-screen h-screen flex justify-center items-center text-red-500">No pages to preview.</div>;
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center text-red-500">
-          <p>{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const selectedPage = pages[selectedIdx];
 
   return (
-    <div className="preview-container">
-      <style dangerouslySetInnerHTML={{ __html: css }} />
-      <div dangerouslySetInnerHTML={{ __html: html }} />
-      {js && <script dangerouslySetInnerHTML={{ __html: js }} />}
+    <div>
+      <header className="px-4 py-1 bg-[#463a3c] text-[#b9a5a6]">
+        <label htmlFor="page-select" className="mr-2 font-semibold">
+          Select Page:
+        </label>
+        <select
+          id="page-select"
+          value={selectedIdx}
+          onChange={(e) => setSelectedIdx(Number(e.target.value))}
+          className="border rounded px-2 py-1"
+        >
+          {pages.map((page, idx) => (
+            <option key={idx} value={idx}>
+              {page.name}
+            </option>
+          ))}
+        </select>
+      </header>
+      {selectedPage && (
+        <main className="preview-container bg-white">
+          <style
+            dangerouslySetInnerHTML={{ __html: selectedPage.preview.css }}
+          />
+          <div
+            dangerouslySetInnerHTML={{ __html: selectedPage.preview.html }}
+          />
+          {selectedPage.preview.js && (
+            <script
+              dangerouslySetInnerHTML={{ __html: selectedPage.preview.js }}
+            />
+          )}
+        </main>
+      )}
     </div>
   );
 };

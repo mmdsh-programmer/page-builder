@@ -1,4 +1,4 @@
-import { Editor } from "grapesjs";
+import { Editor, Page } from "grapesjs";
 import axios from "axios";
 
 /**
@@ -14,9 +14,21 @@ export const saveProjectData = async (
     // Get the full project data (as stored in localStorage by GrapesJS)
     const projectData = editor.getProjectData();
 
+    const pages = projectData.pages.map((page: Page, index: number) => {
+      return {
+        ...page,
+        preview: getPagesHtml(editor)?.[index],
+      }
+    });
+
+    const dataToSave = {
+      ...projectData,
+      pages
+    };
+
     // Save to backend
     const response = await axios.post("/api", {
-      data: projectData,
+      data: dataToSave,
     });
 
     if (response.status === 200) {
@@ -59,4 +71,17 @@ export const loadProjectData = async (
     console.error("Error loading project:", error);
     return { success: false, error };
   }
+};
+
+export const getPagesHtml = (editor: Editor) => {
+  const pages = editor.Pages.getAll();
+  const pagesHtml = pages.map((page) => {
+    const component = page.getMainComponent();
+    return {
+      html: editor.getHtml({ component }),
+      css: editor.getCss({ component }),
+      js: editor.getJs({ component }),
+    };
+  });
+  return pagesHtml;
 };
