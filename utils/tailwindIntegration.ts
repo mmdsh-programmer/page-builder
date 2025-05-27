@@ -40,6 +40,13 @@ export const setupTailwindIntegration = (editor: GrapesEditor) => {
   editor.on("components:add", () => {
     setTimeout(() => {
       editor.runCommand("build-tailwind");
-    }, 300);
+    }, 500);
+  });
+
+  // After a block is dropped into the canvas
+  editor.on("block:drag:stop", () => {
+    setTimeout(() => {
+      editor.runCommand("build-tailwind");
+    }, 500);
   });
 };
