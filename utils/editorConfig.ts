@@ -1,7 +1,3 @@
-/**
- * GrapesJS Editor Configuration
- * Contains the default configuration for the GrapesJS editor
- */
 import gjsForms from "grapesjs-plugin-forms";
 import gjsPresetWebpage from "grapesjs-preset-webpage";
 import grapesjsBlocksBasic from "grapesjs-blocks-basic";
@@ -19,6 +15,7 @@ import grapesjsTyped from "grapesjs-typed";
 import grapesjsTailwindcss from "grapesjs-tailwindcss-plugin";
 import columnSystem from "@/plugins/columnSystem";
 import parserPostCSS from "grapesjs-parser-postcss";
+import grapesjsGoogleMaterialIcons from "grapesjs-google-material-icons";
 
 export const getEditorConfig = () => {
   return {
@@ -47,6 +44,7 @@ export const getEditorConfig = () => {
       grapesjsTyped,
       parserPostCSS,
       grapesjsTailwindcss,
+      grapesjsGoogleMaterialIcons,
     ],
     pluginsOpts: {
       columnSystem: {
@@ -58,6 +56,9 @@ export const getEditorConfig = () => {
         autobuild: true, // Automatically rebuild Tailwind CSS on each update
         buildButton: true, // Add a manual build button to the toolbar
         toolbarPanel: 'options',
+      },
+      "grapesjs-google-material-icons": {
+        // You can add custom options here if needed
       },
     },
     pageManager: {},

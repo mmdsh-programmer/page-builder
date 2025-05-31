@@ -52,40 +52,45 @@ const Preview = () => {
   const selectedPage = pages[selectedIdx];
 
   return (
-    <div>
-      <header className="px-4 py-1 bg-[#463a3c] text-[#b9a5a6]">
-        <label htmlFor="page-select" className="mr-2 font-semibold">
-          Select Page:
-        </label>
-        <select
-          id="page-select"
-          value={selectedIdx}
-          onChange={(e) => setSelectedIdx(Number(e.target.value))}
-          className="border rounded px-2 py-1"
-        >
-          {pages.map((page, idx) => (
-            <option key={idx} value={idx}>
-              {page.name}
-            </option>
-          ))}
-        </select>
-      </header>
-      {selectedPage && (
-        <main className="preview-container bg-white">
-          <style
-            dangerouslySetInnerHTML={{ __html: selectedPage.preview.css }}
-          />
-          <div
-            dangerouslySetInnerHTML={{ __html: selectedPage.preview.html }}
-          />
-          {selectedPage.preview.js && (
-            <script
-              dangerouslySetInnerHTML={{ __html: selectedPage.preview.js }}
+    <>
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp" rel="stylesheet" />
+      <div>
+        <header className="px-4 py-1 bg-[#463a3c] text-[#b9a5a6]">
+          <label htmlFor="page-select" className="mr-2 font-semibold">
+            Select Page:
+          </label>
+          <select
+            id="page-select"
+            value={selectedIdx}
+            onChange={(e) => setSelectedIdx(Number(e.target.value))}
+            className="border rounded px-2 py-1"
+          >
+            {pages.map((page, idx) => (
+              <option key={idx} value={idx}>
+                {page.name}
+              </option>
+            ))}
+          </select>
+        </header>
+        {selectedPage && (
+          <main className="preview-container bg-white">
+            <style
+              dangerouslySetInnerHTML={{ __html: selectedPage.preview.css }}
             />
-          )}
-        </main>
-      )}
-    </div>
+            <div
+              dangerouslySetInnerHTML={{ __html: selectedPage.preview.html }}
+            />
+            {selectedPage.preview.js && (
+              <script
+                dangerouslySetInnerHTML={{ __html: selectedPage.preview.js }}
+              />
+            )}
+          </main>
+        )}
+      </div>
+    </>
   );
 };
 
