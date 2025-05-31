@@ -17,6 +17,7 @@ import columnSystem from "@/plugins/columnSystem";
 import parserPostCSS from "grapesjs-parser-postcss";
 import grapesjsGoogleMaterialIcons from "grapesjs-google-material-icons";
 import grapesjsTailwind from "grapesjs-tailwind";
+import grapesjsFilterStyles from "@silexlabs/grapesjs-filter-styles";
 
 export const getEditorConfig = () => {
   return {
@@ -28,8 +29,8 @@ export const getEditorConfig = () => {
       autoload: true,
     },
     plugins: [
-      grapesjsBlocksBasic, 
-      gjsPresetWebpage, 
+      grapesjsBlocksBasic,
+      gjsPresetWebpage,
       gjsForms,
       columnSystem,
       grapesjsPluginExport,
@@ -47,6 +48,7 @@ export const getEditorConfig = () => {
       grapesjsTailwindcss,
       grapesjsGoogleMaterialIcons,
       grapesjsTailwind,
+      grapesjsFilterStyles,
     ],
     pluginsOpts: {
       columnSystem: {
@@ -57,13 +59,16 @@ export const getEditorConfig = () => {
       "grapesjs-tailwindcss-plugin": {
         autobuild: true, // Automatically rebuild Tailwind CSS on each update
         buildButton: true, // Add a manual build button to the toolbar
-        toolbarPanel: 'options',
+        toolbarPanel: "options",
       },
       "grapesjs-google-material-icons": {
         // You can add custom options here if needed
       },
       "grapesjs-tailwind": {
         // You can add custom options here if needed
+      },
+      "@silexlabs/grapesjs-filter-styles": {
+        /* options */
       },
     },
     pageManager: {},
@@ -103,36 +108,42 @@ export const getEditorConfig = () => {
             "text-align",
             "text-decoration",
             "text-shadow",
-            "direction"
+            "direction",
           ],
           properties: [
             {
-              name: 'Font Family',
-              property: 'font-family',
-              type: 'select',
-              defaults: 'Arial, Helvetica, sans-serif',
+              name: "Font Family",
+              property: "font-family",
+              type: "select",
+              defaults: "Arial, Helvetica, sans-serif",
               list: [
-                { value: 'Arial, Helvetica, sans-serif', name: 'Arial' },
-                { value: 'Georgia, serif', name: 'Georgia' },
-                { value: 'Tahoma, Geneva, sans-serif', name: 'Tahoma' },
-                { value: 'Times New Roman, Times, serif', name: 'Times New Roman' },
-                { value: 'Verdana, Geneva, sans-serif', name: 'Verdana' },
-                { value: 'var(--font-iran-sans)', name: 'Iran Sans' },
-                { value: 'var(--font-iran-yekan-medium)', name: 'Iran Yekan Medium' },
-                { value: 'var(--font-geist-sans)', name: 'Geist Sans' },
-              ]
+                { value: "Arial, Helvetica, sans-serif", name: "Arial" },
+                { value: "Georgia, serif", name: "Georgia" },
+                { value: "Tahoma, Geneva, sans-serif", name: "Tahoma" },
+                {
+                  value: "Times New Roman, Times, serif",
+                  name: "Times New Roman",
+                },
+                { value: "Verdana, Geneva, sans-serif", name: "Verdana" },
+                { value: "var(--font-iran-sans)", name: "Iran Sans" },
+                {
+                  value: "var(--font-iran-yekan-medium)",
+                  name: "Iran Yekan Medium",
+                },
+                { value: "var(--font-geist-sans)", name: "Geist Sans" },
+              ],
             },
             {
-              name: 'Direction',
-              property: 'direction',
-              type: 'select',
-              defaults: 'ltr',
+              name: "Direction",
+              property: "direction",
+              type: "select",
+              defaults: "ltr",
               list: [
-                { value: 'ltr', name: 'Left to Right (LTR)' },
-                { value: 'rtl', name: 'Right to Left (RTL)' }
-              ]
-            }
-          ]
+                { value: "ltr", name: "Left to Right (LTR)" },
+                { value: "rtl", name: "Right to Left (RTL)" },
+              ],
+            },
+          ],
         },
         {
           name: "Decorations",
@@ -149,51 +160,51 @@ export const getEditorConfig = () => {
           ],
           properties: [
             {
-              name: 'Background Image',
-              property: 'background-image',
-              type: 'file',
-              functionName: 'url',
+              name: "Background Image",
+              property: "background-image",
+              type: "file",
+              functionName: "url",
             },
             {
-              name: 'Background Size',
-              property: 'background-size',
-              type: 'select',
-              defaults: 'auto',
+              name: "Background Size",
+              property: "background-size",
+              type: "select",
+              defaults: "auto",
               list: [
-                { value: 'auto', name: 'Auto' },
-                { value: 'cover', name: 'Cover' },
-                { value: 'contain', name: 'Contain' },
+                { value: "auto", name: "Auto" },
+                { value: "cover", name: "Cover" },
+                { value: "contain", name: "Contain" },
               ],
             },
             {
-              name: 'Background Position',
-              property: 'background-position',
-              type: 'select',
-              defaults: 'center center',
+              name: "Background Position",
+              property: "background-position",
+              type: "select",
+              defaults: "center center",
               list: [
-                { value: 'center center', name: 'Center' },
-                { value: 'left top', name: 'Left Top' },
-                { value: 'left center', name: 'Left Center' },
-                { value: 'left bottom', name: 'Left Bottom' },
-                { value: 'right top', name: 'Right Top' },
-                { value: 'right center', name: 'Right Center' },
-                { value: 'right bottom', name: 'Right Bottom' },
-                { value: 'center top', name: 'Center Top' },
-                { value: 'center bottom', name: 'Center Bottom' },
+                { value: "center center", name: "Center" },
+                { value: "left top", name: "Left Top" },
+                { value: "left center", name: "Left Center" },
+                { value: "left bottom", name: "Left Bottom" },
+                { value: "right top", name: "Right Top" },
+                { value: "right center", name: "Right Center" },
+                { value: "right bottom", name: "Right Bottom" },
+                { value: "center top", name: "Center Top" },
+                { value: "center bottom", name: "Center Bottom" },
               ],
             },
             {
-              name: 'Background Repeat',
-              property: 'background-repeat',
-              type: 'select',
-              defaults: 'no-repeat',
+              name: "Background Repeat",
+              property: "background-repeat",
+              type: "select",
+              defaults: "no-repeat",
               list: [
-                { value: 'no-repeat', name: 'No-repeat' },
-                { value: 'repeat', name: 'Repeat' },
-                { value: 'repeat-x', name: 'Repeat-x' },
-                { value: 'repeat-y', name: 'Repeat-y' },
+                { value: "no-repeat", name: "No-repeat" },
+                { value: "repeat", name: "Repeat" },
+                { value: "repeat-x", name: "Repeat-x" },
+                { value: "repeat-y", name: "Repeat-y" },
               ],
-            }
+            },
           ],
         },
         {
@@ -205,88 +216,84 @@ export const getEditorConfig = () => {
             "aspect-ratio",
             "object-fit",
             "object-position",
-            "filter"
+            "filter",
           ],
           properties: [
             {
-              name: 'Object Fit',
-              property: 'object-fit',
-              type: 'select',
-              defaults: 'fill',
+              name: "Object Fit",
+              property: "object-fit",
+              type: "select",
+              defaults: "fill",
               list: [
-                { value: 'fill', name: 'Fill' },
-                { value: 'contain', name: 'Contain' },
-                { value: 'cover', name: 'Cover' },
-                { value: 'none', name: 'None' },
-                { value: 'scale-down', name: 'Scale Down' },
+                { value: "fill", name: "Fill" },
+                { value: "contain", name: "Contain" },
+                { value: "cover", name: "Cover" },
+                { value: "none", name: "None" },
+                { value: "scale-down", name: "Scale Down" },
               ],
             },
             {
-              name: 'Object Position',
-              property: 'object-position',
-              type: 'text',
-              defaults: '50% 50%',
+              name: "Object Position",
+              property: "object-position",
+              type: "text",
+              defaults: "50% 50%",
             },
             {
-              name: 'Aspect Ratio',
-              property: 'aspect-ratio',
-              type: 'text',
-              defaults: '',
+              name: "Aspect Ratio",
+              property: "aspect-ratio",
+              type: "text",
+              defaults: "",
             },
             {
-              name: 'Filter',
-              property: 'filter',
-              type: 'text',
-              defaults: '',
+              name: "Filter",
+              property: "filter",
+              type: "text",
+              defaults: "",
             },
           ],
         },
         {
           name: "Overflow & Visibility",
           open: false,
-          buildProps: [
-            "overflow",
-            "overflow-x",
-            "overflow-y"
-          ],
+          buildProps: ["overflow", "overflow-x", "overflow-y"],
           properties: [
             {
-              name: 'Overflow',
-              property: 'overflow',
-              type: 'select',
-              defaults: 'visible',
+              name: "Overflow",
+              property: "overflow",
+              type: "select",
+              defaults: "visible",
               list: [
-                { value: 'visible', name: 'Visible' },
-                { value: 'hidden', name: 'Hidden' },
-                { value: 'scroll', name: 'Scroll' },
-                { value: 'auto', name: 'Auto' },
-                { value: 'clip', name: 'Clip' },
+                { value: "visible", name: "Visible" },
+                { value: "hidden", name: "Hidden" },
+                { value: "scroll", name: "Scroll" },
+                { value: "auto", name: "Auto" },
+                { value: "clip", name: "Clip" },
               ],
             },
             {
-              name: 'Overflow X',
-              property: 'overflow-x',
-              type: 'select',
-              defaults: 'visible',
+              name: "Overflow X",
+              property: "overflow-x",
+              type: "select",
+              defaults: "visible",
               list: [
-                { value: 'visible', name: 'Visible' },
-                { value: 'hidden', name: 'Hidden' },
-                { value: 'scroll', name: 'Scroll' },
-                { value: 'auto', name: 'Auto' },
-                { value: 'clip', name: 'Clip' },
+                { value: "visible", name: "Visible" },
+                { value: "hidden", name: "Hidden" },
+                { value: "scroll", name: "Scroll" },
+                { value: "auto", name: "Auto" },
+                { value: "clip", name: "Clip" },
               ],
             },
             {
-              name: 'Overflow Y',
-              property: 'overflow-y',
-              type: 'select',
-              defaults: 'visible',
+              name: "Overflow Y",
+              property: "overflow-y",
+              type: "select",
+              defaults: "visible",
               list: [
-                { value: 'visible', name: 'Visible' },
-                { value: 'hidden', name: 'Hidden' },
-                { value: 'scroll', name: 'Scroll' },
-                { value: 'auto', name: 'Auto' },
-                { value: 'clip', name: 'Clip' },
+                { value: "visible", name: "Visible" },
+                { value: "hidden", name: "Hidden" },
+                { value: "scroll", name: "Scroll" },
+                { value: "auto", name: "Auto" },
+                { value: "clip", name: "Clip" },
               ],
             },
           ],
@@ -294,9 +301,7 @@ export const getEditorConfig = () => {
       ],
     },
     canvas: {
-      styles: [
-        "http://localhost:3000/custom.css",
-      ],
+      styles: ["http://localhost:3000/custom.css"],
     },
   };
-}; 
+};

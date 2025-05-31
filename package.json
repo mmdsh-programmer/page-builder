@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@grapesjs/react": "^1.0.0",
+    "@silexlabs/grapesjs-filter-styles": "^1.1.0",
     "@silexlabs/grapesjs-fonts": "^1.0.21",
     "axios": "^1.7.7",
     "destack": "^3.0.8",
