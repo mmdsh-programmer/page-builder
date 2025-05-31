@@ -16,6 +16,7 @@ import grapesjsTailwindcss from "grapesjs-tailwindcss-plugin";
 import columnSystem from "@/plugins/columnSystem";
 import parserPostCSS from "grapesjs-parser-postcss";
 import grapesjsGoogleMaterialIcons from "grapesjs-google-material-icons";
+import grapesjsTailwind from "grapesjs-tailwind";
 
 export const getEditorConfig = () => {
   return {
@@ -45,6 +46,7 @@ export const getEditorConfig = () => {
       parserPostCSS,
       grapesjsTailwindcss,
       grapesjsGoogleMaterialIcons,
+      grapesjsTailwind,
     ],
     pluginsOpts: {
       columnSystem: {
@@ -58,6 +60,9 @@ export const getEditorConfig = () => {
         toolbarPanel: 'options',
       },
       "grapesjs-google-material-icons": {
+        // You can add custom options here if needed
+      },
+      "grapesjs-tailwind": {
         // You can add custom options here if needed
       },
     },
