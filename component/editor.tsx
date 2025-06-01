@@ -17,6 +17,7 @@ import PageManager from "./pageManager";
 const Editor = () => {
   const editor = useRef<GrapesEditor | null>(null);
   const [pageManagerOpen, setPageManagerOpen] = React.useState(false);
+  const [isSaving, setIsSaving] = React.useState(false);
   
   useEffect(() => {
     if (editor.current) return;
@@ -97,7 +98,9 @@ const Editor = () => {
 
   const handleSaveProject = async () => {
     if (!editor.current) return;
+    setIsSaving(true);
     const result = await saveProjectData(editor.current);
+    setIsSaving(false);
     if (result.success) {
       alert("Template saved successfully!");
     } else {
@@ -130,6 +133,29 @@ const Editor = () => {
 
   return (
     <div className="GrapesjsApp h-screen w-screen flex flex-col overflow-hidden">
+      {isSaving && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          background: 'rgba(255,255,255,0.8)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '2rem',
+          color: '#333',
+          flexDirection: 'column',
+        }}>
+          <div className="loader" style={{marginBottom: 20}}>
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="24" cy="24" r="20" stroke="#6366f1" strokeWidth="4" strokeDasharray="31.4 31.4" strokeLinecap="round">
+                <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" from="0 24 24" to="360 24 24"/>
+              </circle>
+            </svg>
+          </div>
+          Saving project...
+        </div>
+      )}
       <div className="Editor-content flex-grow overflow-hidden relative">
         <div id="gjs" className="!h-full w-full absolute inset-0" />
         <PageManager editor={editor.current} open={pageManagerOpen} onClose={() => setPageManagerOpen(false)} />

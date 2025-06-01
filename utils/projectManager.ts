@@ -14,10 +14,12 @@ export const saveProjectData = async (
     // Get the full project data (as stored in localStorage by GrapesJS)
     const projectData = editor.getProjectData();
 
+    // Await the async getPagesHtml
+    const pagesHtmlArr = await getPagesHtml(editor);
     const pages = projectData.pages.map((page: Page, index: number) => {
       return {
         ...page,
-        preview: getPagesHtml(editor)?.[index],
+        preview: pagesHtmlArr?.[index],
       }
     });
 
@@ -73,15 +75,30 @@ export const loadProjectData = async (
   }
 };
 
-export const getPagesHtml = (editor: Editor) => {
+// Utility to wait for a given number of milliseconds
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export const getPagesHtml = async (editor: Editor) => {
   const pages = editor.Pages.getAll();
-  const pagesHtml = pages.map((page) => {
+  const originalSelected = editor.Pages.getSelected();
+  const pagesHtml = [];
+
+  for (const page of pages) {
+    editor.Pages.select(page);
+    await wait(100); // Wait for the page to render
     const component = page.getMainComponent();
-    return {
+    pagesHtml.push({
       html: editor.getHtml({ component }),
       css: editor.getCss({ component }),
       js: editor.getJs({ component }),
-    };
-  });
+    });
+  }
+
+  // Restore the originally selected page
+  if (originalSelected) {
+    editor.Pages.select(originalSelected);
+    await wait(100);
+  }
+
   return pagesHtml;
 };
