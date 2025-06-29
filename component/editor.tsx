@@ -2,45 +2,45 @@
 
 import React, { useEffect, useRef } from "react";
 import grapesjs, { Editor as GrapesEditor } from "grapesjs";
-
-// Import configs and utilities
 import { getEditorConfig } from "@/utils/editorConfig";
 import { setupComponentCSSModal } from "@/utils/componentCssManager";
 import { setupIframeScrolling } from "@/utils/iframeManager";
 import { setupCustomComponents, setupCustomBlocks } from "@/utils/componentsManager";
-import { saveProjectData, loadProjectData } from "@/utils/projectManager";
 import { setupEditorStyles } from "@/utils/cssManager";
 import { openPreviewInNewTab, showPreviewInModal } from "@/utils/previewManager";
 import { setupTailwindIntegration } from "@/utils/tailwindIntegration";
-import PageManager from "./pageManager";
+import { IframeAction, IframeMode } from "@/interface/enum";
+import { compressData, safeDecompress } from "@/utils/compressionManager";
 
 const Editor = () => {
   const editor = useRef<GrapesEditor | null>(null);
-  const [pageManagerOpen, setPageManagerOpen] = React.useState(false);
-  const [isSaving, setIsSaving] = React.useState(false);
-  
+  const saveRef = useRef<boolean>(true);
+
   useEffect(() => {
     if (editor.current) return;
-    
-    // Initialize the editor with the configuration
+
     editor.current = grapesjs.init(getEditorConfig());
-    
+
     const currentEditor = editor.current;
-    
-    // Set up all editor extensions and utilities
+
     setupComponentCSSModal(currentEditor);
     setupIframeScrolling(currentEditor);
     setupCustomComponents(currentEditor);
     setupCustomBlocks(currentEditor);
     setupEditorStyles(currentEditor);
     setupTailwindIntegration(currentEditor);
-    
-    // Force initial build of Tailwind CSS to ensure classes are applied
+
     setTimeout(() => {
       currentEditor.runCommand('build-tailwind');
     }, 500);
-    
-    // Add device manager buttons
+
+    currentEditor.on('component:add component:remove component:update component:styleUpdate', () => {
+      saveRef.current = false;
+      window.parent.postMessage({ action: IframeAction.TRACK_CHANGE }, "*");
+    });
+
+    window.addEventListener("message", handleParentMessage, false);
+
     const panelDevices = currentEditor.Panels.addPanel({
       id: "devices-c",
       visible: true,
@@ -51,26 +51,11 @@ const Editor = () => {
     if (buttons) {
       buttons.add([
         {
-          id: "save-project",
-          command: () => handleSaveProject(),
-          className: "fa fa-floppy-o",
-          attributes: { title: "Save Project" },
-        },
-        // Add load button
-        {
-          id: "load-project",
-          command: () => handleLoadProject(),
-          className: "fa fa-upload",
-          attributes: { title: "Load Project" },
-        },
-        // Add preview button
-        {
           id: "preview-static",
           command: () => handlePreview(),
           className: "fa fa-eye",
           attributes: { title: "Preview" },
         },
-        // Add in-editor preview button
         {
           id: "preview-modal",
           command: () => handlePreviewInModal(),
@@ -86,39 +71,129 @@ const Editor = () => {
       ]);
     }
 
-    // Add a button to open the page manager
-    currentEditor.Panels.addButton('views', {
-      id: 'open-pages',
-      className: 'fa fa-file-o',
-      attributes: { title: 'Manage Pages' },
-      command: () => setPageManagerOpen(true),
-      togglable: false,
-    });
+    return () => {
+      window.removeEventListener("message", handleParentMessage);
+    };
   }, []);
 
-  const handleSaveProject = async () => {
-    if (!editor.current) return;
-    setIsSaving(true);
-    const result = await saveProjectData(editor.current);
-    setIsSaving(false);
-    if (result.success) {
-      alert("Template saved successfully!");
-    } else {
-      console.error("Failed to save template:", result.error);
-      alert("Failed to save template. Please try again.");
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!saveRef.current) {
+        event.preventDefault();
+        event.returnValue = "sure to leave?";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
+  const isParsableString = (text: string): boolean => {
+    try {
+      JSON.parse(text);
+      return true;
+    } catch {
+      return false;
     }
   };
 
-  const handleLoadProject = async () => {
+  const handleParentMessage = async (event: MessageEvent) => {
     if (!editor.current) return;
-    
-    const result = await loadProjectData(editor.current);
-    
-    if (result.success) {
-      alert("Template loaded successfully!");
-    } else {
-      console.error("Failed to load template:", result.error);
-      alert("Failed to load template. Please try again.");
+    const currentEditor = editor.current;
+
+    const isParsable =
+      typeof event.data === "string" && isParsableString(event.data);
+
+    if (typeof event.data === "string" && !isParsable) {
+      return;
+    }
+
+    const messageData = typeof event.data === "string" ? JSON.parse(event.data) : event.data;
+    const { action, key, value } = messageData;
+
+    if (
+      action === IframeMode.PREVIEW ||
+      action === IframeMode.TEMPORARY_PREVIEW
+    ) {
+      currentEditor.select();
+      const wrapper = currentEditor.getWrapper();
+      wrapper?.set('selectable', false);
+      wrapper?.set('hoverable', false);
+      currentEditor.Panels.getPanels().forEach((panel: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+        if (panel.id !== 'views') {
+          panel.set('visible', false);
+        }
+      });
+    } else if (action === IframeMode.EDIT) {
+      const wrapper = currentEditor.getWrapper();
+      wrapper?.set('selectable', true);
+      wrapper?.set('hoverable', true);
+      currentEditor.Panels.getPanels().forEach((panel: any) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+        panel.set('visible', true);
+      });
+    } else if (action === IframeAction.GET_DATA) {
+      saveRef.current = true;
+      const projectData = currentEditor.getProjectData();
+      const htmlContent = currentEditor.getHtml();
+      const cssContent = currentEditor.getCss();
+
+      const dataToCompress = {
+        projectData,
+        html: htmlContent,
+        css: cssContent
+      };
+
+      const compressedData = compressData(dataToCompress);
+
+      if (event.source) {
+        (event.source as Window).postMessage(
+          { action, key, value: compressedData },
+          "*"
+        );
+      }
+
+      if (
+        typeof window !== "undefined" &&
+        (window as any).flutter_inappwebview // eslint-disable-line @typescript-eslint/no-explicit-any
+      ) {
+        (window as any).flutter_inappwebview?.callHandler( // eslint-disable-line @typescript-eslint/no-explicit-any
+          "flutter_handler",
+          { action, key, value: { content: compressedData } }
+        );
+      }
+    } else if (action === IframeAction.SET_DATA) {
+      if (value?.content) {
+        try {
+          const decompressedData = safeDecompress(value.content);
+
+          if (typeof decompressedData === 'object' && decompressedData && 'projectData' in decompressedData) {
+            currentEditor.loadProjectData((decompressedData as { projectData: any }).projectData); // eslint-disable-line @typescript-eslint/no-explicit-any
+          }
+          setTimeout(() => {
+            currentEditor.runCommand('build-tailwind');
+          }, 500);
+        } catch (error) {
+          console.error("Error parsing project data:", error);
+        }
+      }
+    } else if (action === IframeAction.LOAD) {
+      if (value?.content) {
+        try {
+          const decompressedData = safeDecompress(value.content);
+
+          if (typeof decompressedData === 'object' && decompressedData && 'projectData' in decompressedData) {
+            currentEditor.loadProjectData((decompressedData as { projectData: any }).projectData); // eslint-disable-line @typescript-eslint/no-explicit-any
+          }
+          setTimeout(() => {
+            currentEditor.runCommand('build-tailwind');
+          }, 500);
+        } catch (error) {
+          console.error("Error parsing project data:", error);
+        }
+      }
     }
   };
 
@@ -133,32 +208,8 @@ const Editor = () => {
 
   return (
     <div className="GrapesjsApp h-screen w-screen flex flex-col overflow-hidden">
-      {isSaving && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(255,255,255,0.8)',
-          zIndex: 9999,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '2rem',
-          color: '#333',
-          flexDirection: 'column',
-        }}>
-          <div className="loader" style={{marginBottom: 20}}>
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="24" cy="24" r="20" stroke="#6366f1" strokeWidth="4" strokeDasharray="31.4 31.4" strokeLinecap="round">
-                <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" from="0 24 24" to="360 24 24"/>
-              </circle>
-            </svg>
-          </div>
-          Saving project...
-        </div>
-      )}
       <div className="Editor-content flex-grow overflow-hidden relative">
         <div id="gjs" className="!h-full w-full absolute inset-0" />
-        <PageManager editor={editor.current} open={pageManagerOpen} onClose={() => setPageManagerOpen(false)} />
       </div>
     </div>
   );

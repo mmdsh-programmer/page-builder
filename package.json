@@ -39,6 +39,7 @@
     "grapesjs-typed": "^2.0.1",
     "grapesjs-ui-suggest-classes": "^1.0.19",
     "jsdom": "^25.0.1",
+    "lz-string": "^1.5.0",
     "next": "15.0.2",
     "react": "19.0.0-rc-02c0e824-20241028",
     "react-dom": "19.0.0-rc-02c0e824-20241028",
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.4",
     "@types/jsdom": "^21.1.7",
+    "@types/lz-string": "^1.5.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

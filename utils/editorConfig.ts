@@ -23,11 +23,7 @@ export const getEditorConfig = () => {
   return {
     container: "#gjs",
     fromElement: false,
-    storageManager: {
-      type: "local",
-      autosave: true,
-      autoload: true,
-    },
+    storageManager: false,
     plugins: [
       grapesjsBlocksBasic,
       gjsPresetWebpage,
@@ -71,7 +67,7 @@ export const getEditorConfig = () => {
         /* options */
       },
     },
-    pageManager: {},
+
     // Configure asset manager
     assetManager: {
       assets: [],

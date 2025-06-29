@@ -1,9 +1,6 @@
 import { Editor, Page } from "grapesjs";
 import axios from "axios";
 
-/**
- * Saves the project data with circular reference handling
- */
 export const saveProjectData = async (
   editor: Editor
 ): Promise<{ success: boolean; error?: Error | unknown }> => {
@@ -11,10 +8,8 @@ export const saveProjectData = async (
     if (!editor)
       return { success: false, error: new Error("Editor not initialized") };
 
-    // Get the full project data (as stored in localStorage by GrapesJS)
     const projectData = editor.getProjectData();
 
-    // Await the async getPagesHtml
     const pagesHtmlArr = await getPagesHtml(editor);
     const pages = projectData.pages.map((page: Page, index: number) => {
       return {
@@ -28,7 +23,6 @@ export const saveProjectData = async (
       pages
     };
 
-    // Save to backend
     const response = await axios.post("/api", {
       data: dataToSave,
     });
@@ -44,9 +38,6 @@ export const saveProjectData = async (
   }
 };
 
-/**
- * Loads project data into the editor
- */
 export const loadProjectData = async (
   editor: Editor
 ): Promise<{ success: boolean; error?: Error | unknown }> => {
@@ -57,13 +48,10 @@ export const loadProjectData = async (
     const response = await axios.get("/api");
     const data = response.data;
 
-    // The backend returns the project data directly
     const projectData = data.data || data;
 
-    // Load the project data into GrapesJS
     editor.loadProjectData(projectData);
 
-    // Force rebuild of Tailwind CSS after loading project to ensure classes are applied
     setTimeout(() => {
       editor.runCommand("build-tailwind");
     }, 300);
@@ -75,7 +63,6 @@ export const loadProjectData = async (
   }
 };
 
-// Utility to wait for a given number of milliseconds
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const getPagesHtml = async (editor: Editor) => {
@@ -85,7 +72,7 @@ export const getPagesHtml = async (editor: Editor) => {
 
   for (const page of pages) {
     editor.Pages.select(page);
-    await wait(100); // Wait for the page to render
+    await wait(100);
     const component = page.getMainComponent();
     pagesHtml.push({
       html: editor.getHtml({ component }),
@@ -94,7 +81,6 @@ export const getPagesHtml = async (editor: Editor) => {
     });
   }
 
-  // Restore the originally selected page
   if (originalSelected) {
     editor.Pages.select(originalSelected);
     await wait(100);
